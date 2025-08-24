@@ -73,3 +73,34 @@ body {
   background: #fff;
   color: #2a003a;
 }
+
+#menu-principal .contenedor {
+  max-width: 1500px;
+  min-height: 675px; 
+  padding: 56px 56px 48px 56px; /* Más espacio interno */
+}
+
+#menu-principal .contenedor-flex {
+  height: 100%;
+  align-items: center;
+}
+
+
+.btn-grande {
+  padding: 14px 0;
+  font-size: 1.2em;
+  border-radius: 10px;
+  background: #00aaff;
+  color: #fff;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px #0002;
+}
+
+.btn-grande:hover {
+  background: #0077cc;
+  transform: scale(1.05);
+}

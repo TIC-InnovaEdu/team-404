@@ -45,3 +45,38 @@
       </div>
     </div>
   </section>
+
+  <section id="menu-principal" class="oculto">
+    <div class="contenedor">
+      <h1 class="titulo">La Ruta del Acento</h1>
+      <div id="btn-ver-records" class="btn-records-menu">
+        <button class="btn-imagen btn-records" onclick="mostrarRecords()">
+          <img src="Recursos/botonRecords.png" alt="Records" />
+        </button>
+      </div>
+      <div class="contenedor-flex">
+        <div class="menu-izquierda">
+          <button class="btn-imagen iniciar" onclick="mostrarJuego()">
+            <img src="Recursos/boton1.png" alt="Iniciar" />
+          </button>
+          <button class="btn-imagen niveles" onclick="mostrarNiveles()">
+            <img src="Recursos/boton2.png" alt="Niveles" />
+          </button>
+          <button class="btn-imagen salir" onclick="salir()">
+            <img src="Recursos/boton3.png" alt="Salir" />
+          </button>
+        </div>
+        <div class="menu-derecha">
+          <img id="imagen-personaje" src="Recursos/pikachu.png" alt="Personaje" class="personaje-img" />
+          <div class="personaje-select-imagenes">
+            <img src="Recursos/pikachu-simbolo.png" alt="Pikachu" class="personaje-opcion"
+              onclick="cambiarPersonaje('pikachu.png')" />
+            <img src="Recursos/luigi-simbolo.png" alt="Luigi" class="personaje-opcion"
+              onclick="cambiarPersonaje('luigi.png')" />
+            <img src="Recursos/cuphead-simbolo.png" alt="Cuphead" class="personaje-opcion"
+              onclick="cambiarPersonaje('cuphead.png')" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
