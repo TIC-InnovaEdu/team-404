@@ -146,3 +146,41 @@
     </div>
   </div>
 </section>
+
+<!-- Pantalla de juego -->
+  <section id="pantalla-juego" class="oculto">
+    <div class="contenedor">
+      <div class="juego-flex">
+        <div class="contador-box">
+          <div id="contador-tiempo">
+            <span>Tiempo restante:</span>
+            <span id="contador-valor">30s</span>
+          </div>
+          <!-- Botones de acción para fin de juego -->
+          <div id="botones-fin-juego" class="oculto">
+            <div class="botones-fila-superior">
+              <img id="btn-niveles" src="Recursos/botonAtras.png" alt="Niveles" class="boton-img"
+                title="Regresar a niveles">
+              <img id="btn-reintentar" src="Recursos/botonRepetirNivel.png" alt="Reintentar" class="boton-img"
+                title="Reintentar nivel">
+              <img id="btn-siguiente" src="Recursos/botonSiguienteNivel.png" alt="Siguiente" class="boton-img oculto"
+                title="Siguiente nivel">
+            </div>
+            <div class="boton-fila-inferior">
+              <img id="btn-menu" src="Recursos/botonVolverMenu.png" alt="Menú" class="boton-img" title="Salir al menú">
+            </div>
+          </div>
+        </div>
+        <div class="mapa-box">
+          <canvas id="canvas-juego"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <audio id="musica-fondo" src="Recursos/FondoMenu.wav" loop></audio>
+  <script src="script.js"></script>
+</body>
+
+</html>
+
