@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laberinto Educativo</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Audiowide&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+
+  <section id="pantalla-inicio">
+    <div class="contenedor">
+      <h1 class="titulo">Bienvenido</h1>
+      <div id="login-form" class="login-form">
+        <h2>Iniciar Sesión</h2>
+        <input type="text" placeholder="Usuario" />
+        <input type="password" placeholder="Clave" />
+        <button class="btn-grande" onclick="irAlMenu()">Entrar</button>
+        <div class="alternar-form">
+          ¿No tienes cuenta? <span onclick="mostrarRegistro()" class="alternar-link">Regístrate</span>
+        </div>
+      </div>
+      <div id="registro-form" class="registro-form oculto">
+        <h2>Registrarse</h2>
+        <input type="text" placeholder="Nombre" />
+        <input type="password" placeholder="Clave" />
+        <input type="number" placeholder="Edad" />
+        <input type="email" placeholder="Correo" />
+        <input type="text" placeholder="Curso" />
+        <select>
+          <option value="">Género</option>
+          <option value="M">Masculino</option>
+          <option value="F">Femenino</option>
+          <option value="Otro">Otro</option>
+        </select>
+        <button class="btn-grande" onclick="irAlMenu()">Registrarse</button>
+        <div class="alternar-form">
+          ¿Ya tienes cuenta? <span onclick="mostrarLogin()" class="alternar-link">Inicia sesión</span>
+        </div>
+      </div>
+    </div>
+  </section>

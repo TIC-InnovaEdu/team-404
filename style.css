@@ -1,0 +1,75 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: url('Recursos/Fondo.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  min-height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+}
+
+.oculto {
+  display: none !important;
+}
+
+.contenedor {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+  background: rgba(42, 0, 58, 0.7);
+  border-radius: 18px;
+  position: relative;
+}
+
+.contenedor-flex {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 48px;
+}
+
+.formularios-flex {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.login-form,
+.registro-form {
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto 24px auto;
+  background: rgba(42, 0, 58, 0.85);
+  padding: 32px 24px 24px 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px #0004;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-form h2,
+.registro-form h2 {
+  margin-bottom: 12px;
+  font-size: 1.3em;
+  color: #00aaff;
+  text-align: center;
+}
+
+.login-form input,
+.registro-form input,
+.registro-form select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1em;
+  margin-bottom: 8px;
+  background: #fff;
+  color: #2a003a;
+}
