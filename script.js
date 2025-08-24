@@ -143,3 +143,113 @@ const velocidadKrisPorNivel = [
   6, 
   7  
 ];
+
+
+document.addEventListener("keydown", (e) => {
+  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+    e.preventDefault(); 
+    teclasPresionadas[e.key] = true;
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+    e.preventDefault();
+    teclasPresionadas[e.key] = false;
+  }
+});
+
+document.addEventListener("keydown", (e) => {  
+  teclasPresionadas[e.key] = true;
+  if (e.key === "Escape") {
+    const juegoVisible = !document.getElementById("pantalla-juego").classList.contains("oculto");
+    const nivelesVisible = !document.getElementById("pantalla-niveles").classList.contains("oculto");
+    if (!document.getElementById("pantalla-records").classList.contains("oculto")) {
+      document.getElementById("pantalla-records").classList.add("oculto");
+      document.getElementById("menu-principal").classList.remove("oculto");
+    }
+    if (juegoVisible || nivelesVisible) {
+      volverAlMenu();
+    }
+  }
+
+});
+
+
+
+preCargarSprites(personajeSeleccionado);
+
+
+function preCargarSprites(nombreArchivo) {
+  const baseNombre = nombreArchivo.split(".")[0].toLowerCase();
+  const max = spritesPorDireccion[nombreArchivo];
+  const direcciones = ["up", "down", "left", "right"];
+
+  imagenesCargadas[baseNombre] = {};
+
+  direcciones.forEach(dir => {
+    imagenesCargadas[baseNombre][dir] = [];
+    for (let i = 1; i <= max; i++) {
+      const img = new Image();
+      img.src = Recursos/${baseNombre}${i}${dir}.png;
+      imagenesCargadas[baseNombre][dir].push(img);
+    }
+  });
+
+  const idle = new Image();
+  idle.src = Recursos/${baseNombre}Idle.png;
+  imagenesCargadas[baseNombre]["idle"] = idle;
+}
+function mostrarJuego() {
+  document.getElementById("menu-principal").classList.add("oculto");
+  document.getElementById("pantalla-niveles").classList.add("oculto");
+  document.getElementById("pantalla-juego").classList.remove("oculto");
+  iniciarNivel(0);
+  pausarMusicaFondo();
+}
+
+function mostrarRegistro() {
+  document.getElementById("login-form").classList.add("oculto");
+  document.getElementById("registro-form").classList.remove("oculto");
+  pausarMusicaFondo();
+}
+
+function mostrarLogin() {
+  document.getElementById("registro-form").classList.add("oculto");
+  document.getElementById("login-form").classList.remove("oculto");
+  pausarMusicaFondo();
+}
+
+function volverAlMenu() {
+  document.getElementById("pantalla-juego").classList.add("oculto");
+  document.getElementById("pantalla-niveles").classList.add("oculto");
+  document.getElementById("menu-principal").classList.remove("oculto");
+  reproducirMusicaFondo();
+}
+function salir() {
+  document.getElementById("menu-principal").classList.add("oculto");
+  document.getElementById("pantalla-inicio").classList.remove("oculto");
+  pausarMusicaFondo();
+}
+
+function irAlMenu() {
+  document.getElementById("pantalla-juego").classList.add("oculto");
+  document.getElementById("pantalla-inicio").classList.add("oculto");
+  document.getElementById("menu-principal").classList.remove("oculto");
+  reproducirMusicaFondo();
+}
+
+function mostrarNiveles() {
+  document.getElementById("pantalla-juego").classList.add("oculto");
+  document.getElementById("menu-principal").classList.add("oculto");
+  document.getElementById("pantalla-niveles").classList.remove("oculto");
+  reproducirMusicaFondo();
+}
+
+function mostrarRecords() {
+  document.getElementById("menu-principal").classList.add("oculto");
+  document.getElementById("pantalla-records").classList.remove("oculto");
+  document.getElementById("records-subtitulo").textContent = "Selecciona un nivel para ver los records.";
+  document.getElementById("tabla-records").innerHTML = "";
+  reproducirMusicaFondo();
+}
