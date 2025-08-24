@@ -839,7 +839,86 @@ function verificarColisionKris() {
   });
 }
 
+function mostrarBotonesFinJuego(tipo) {
+  const contenedor = document.getElementById("botones-fin-juego");
+  const btnNiveles = document.getElementById("btn-niveles");
+  const btnMenu = document.getElementById("btn-menu");
+  const btnReintentar = document.getElementById("btn-reintentar");
+  const btnSiguiente = document.getElementById("btn-siguiente");
 
+  contenedor.classList.remove("oculto");
+  btnNiveles.classList.remove("oculto");
+  btnMenu.classList.remove("oculto");
+
+  if (tipo === "perder") {
+    btnReintentar.classList.remove("oculto");
+    btnSiguiente.classList.add("oculto");
+  } else if (tipo === "ganar") {
+    btnReintentar.classList.add("oculto");
+    btnSiguiente.classList.remove("oculto");
+  }
+}
+
+function ocultarBotonesFinJuego() {
+  document.getElementById("botones-fin-juego").classList.add("oculto");
+}
+
+document.getElementById("btn-niveles").onclick = function () {
+  ocultarBotonesFinJuego();
+  mostrarNiveles();
+};
+document.getElementById("btn-menu").onclick = function () {
+  ocultarBotonesFinJuego();
+  volverAlMenu();
+};
+document.getElementById("btn-reintentar").onclick = function () {
+  ocultarBotonesFinJuego();
+  iniciarNivel(nivelActual);
+};
+document.getElementById("btn-siguiente").onclick = function () {
+  ocultarBotonesFinJuego();
+  if (nivelActual < mapasPorNivel.length - 1) {
+    iniciarNivel(nivelActual + 1);
+  } else {
+    volverAlMenu();
+  }
+};
+
+function volverAlMenuDesdeRecords() {
+  document.getElementById("pantalla-records").classList.add("oculto");
+  document.getElementById("menu-principal").classList.remove("oculto");
+}
+
+function verRecordsNivel(nivel) {
+  document.getElementById("tabla-records").innerHTML =
+    `<p class="subtitulo-dificultad">Records del nivel ${nivel + 1}:</p>
+     <p>(Aquí se mostrarán los 5 mejores tiempos)</p>`;
+}
+
+function reproducirMusicaFondo() {
+  if (musicaFondo && musicaFondo.paused) {
+    musicaFondo.currentTime = 0;
+    musicaFondo.play();
+  }
+}
+
+function pausarMusicaFondo() {
+  if (!musicaFondo.paused) {
+    musicaFondo.pause();
+    musicaFondo.currentTime = 0;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  musicaFondo = document.getElementById("musica-fondo");
+});
+
+function entrarANivel(idx) {
+  pausarMusicaFondo();
+  iniciarNivel(idx);
+}
+
+inicializarBotonesNiveles();
 
 const mapasPorNivel = [
   // Dificultad facil
