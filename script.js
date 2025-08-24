@@ -447,6 +447,400 @@ function dibujarPreguntaAnimada(ctx) {
   ctx.restore();
 }
 
+function moverPersonaje() {
+  if (!preguntaAnim.done) return;
+  if (tiempoRestante <= 0) return; 
+  if (moviendo) return;
+
+  const col = Math.floor(posX / tileSize);
+  const fil = Math.floor(posY / tileSize);
+
+  if (teclasPresionadas["ArrowUp"]) {
+    direccion = "up";
+    if (puedeMoverJugador(col, fil - 1)) {
+      destinoY -= tileSize;
+      moviendo = true;
+    }
+  } else if (teclasPresionadas["ArrowDown"]) {
+    direccion = "down";
+    if (puedeMoverJugador(col, fil + 1)) {
+      destinoY += tileSize;
+      moviendo = true;
+    }
+  } else if (teclasPresionadas["ArrowLeft"]) {
+    direccion = "left";
+    if (puedeMoverJugador(col - 1, fil)) {
+      destinoX -= tileSize;
+      moviendo = true;
+    }
+  } else if (teclasPresionadas["ArrowRight"]) {
+    direccion = "right";
+    if (puedeMoverJugador(col + 1, fil)) {
+      destinoX += tileSize;
+      moviendo = true;
+    }
+  }
+}
+
+function puedeMoverJugador(x, y) {
+  if (y < 0 || y >= mapa.length || x < 0 || x >= mapa[0].length) return false;
+  return mapa[y][x] !== 1;
+}
+
+function puedeMoverKris(x, y) {
+  if (y < 0 || y >= mapa.length || x < 0 || x >= mapa[0].length) return false;
+  return mapa[y][x] !== 1 && mapa[y][x] !== 2 && mapa[y][x] !== 3;
+}
+
+function actualizarPosicion() {
+  if (!moviendo) return;
+
+  const dx = destinoX - posX;
+  const dy = destinoY - posY;
+
+  const antesX = posX;
+  const antesY = posY;
+
+  if (Math.abs(dx) > velocidad) posX += velocidad * Math.sign(dx);
+  else posX = destinoX;
+
+  if (Math.abs(dy) > velocidad) posY += velocidad * Math.sign(dy);
+  else posY = destinoY;
+
+  distanciaDesdeInicio += Math.abs(posX - antesX) + Math.abs(posY - antesY);
+
+  if (posX === destinoX && posY === destinoY) {
+    moviendo = false;
+    distanciaDesdeInicio = 0;
+  }
+  const col = Math.floor(posX / tileSize);
+  const fil = Math.floor(posY / tileSize);
+
+  krisList.forEach(kris => {
+    if (kris.activo) {
+      const distKris = Math.abs(posX - kris.x) + Math.abs(posY - kris.y);
+      if (distKris < tileSize * 0.7) {
+        kris.activo = false;
+        terminarJuego("Te atrapó Kris 💀", "#ff4444");
+      }
+    }
+  });
+
+  if (mapa[fil] && mapa[fil][col] === 2) {
+    terminarJuego("GAME OVER", "#ff4444");
+  } else if (mapa[fil] && mapa[fil][col] === 3) {
+    terminarJuego("Has completado el nivel", "#44ff44");
+  }
+
+}
+
+function dibujarMapa(ctx) {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+  const tex = imagenesTexturas[nivelActual];
+
+  for (let y = 0; y < mapa.length; y++) {
+    for (let x = 0; x < mapa[y].length; x++) {
+      const valor = mapa[y][x];
+      if (valor === 9) continue;
+      let usarImagen = false;
+
+      const filasPregunta = 2;
+
+      if (
+        x === 0 ||
+        y === 0 ||
+        x === mapa[0].length - 1 ||
+        y === mapa.length - 1 - filasPregunta
+      ) {
+        if (tex?.bordes?.complete) {
+          ctx.drawImage(tex.bordes, x * tileSize, y * tileSize, tileSize, tileSize);
+          usarImagen = true;
+        }
+      } else if ((valor === 0 || valor === 4) && tex?.camino?.complete) {
+        ctx.drawImage(tex.camino, x * tileSize, y * tileSize, tileSize, tileSize);
+        usarImagen = true;
+      } else if (valor === 1 && tex?.colision?.complete) {
+        ctx.drawImage(tex.colision, x * tileSize, y * tileSize, tileSize, tileSize);
+        usarImagen = true;
+      }
+    }
+  }
+
+  const palabras = palabrasPorNivel[nivelActual];
+  let indexPalabra = 0;
+  const visitados = new Set();
+
+  for (let y = 0; y < mapa.length; y++) {
+    for (let x = 0; x < mapa[y].length; x++) {
+      const valor = mapa[y][x];
+      if ((valor === 2 || valor === 3) && !visitados.has(`${x},${y}`)) {
+        if (indexPalabra >= palabras.length) return;
+
+        for (let dy = 0; dy < 2; dy++) {
+          for (let dx = 0; dx < 3; dx++) {
+            visitados.add(`${x + dx},${y + dy}`);
+          }
+        }
+
+        const tiempo = performance.now() / 1000;
+        const desplazamiento = Math.sin(tiempo * 2) * 100;
+
+        const grad = ctx.createLinearGradient(
+          x * tileSize + desplazamiento,
+          y * tileSize,
+          (x + 3) * tileSize + desplazamiento,
+          (y + 2) * tileSize
+        );
+
+        grad.addColorStop(0, "#cccccc");
+        grad.addColorStop(0.5, "#b19cd9");
+        grad.addColorStop(1, "#aee4ff");
+
+        ctx.fillStyle = grad;
+        ctx.fillRect(x * tileSize, y * tileSize, tileSize * 3, tileSize * 2);
+
+        ctx.fillStyle = "#003366";
+        ctx.font = `bold ${tileSize * 0.4}px 'Press Start 2P', Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.shadowBlur = 0;
+        ctx.fillText(
+          palabras[indexPalabra],
+          x * tileSize + (tileSize * 3) / 2,
+          y * tileSize + tileSize
+        );
+        ctx.shadowBlur = 0;
+
+        indexPalabra++;
+      }
+    }
+  }
+
+  const ahora = Date.now();
+  const baseNombre = personajeSeleccionado.split(".")[0].toLowerCase();
+  let img;
+
+  const hayTecla = teclasPresionadas["ArrowUp"] || teclasPresionadas["ArrowDown"] ||
+    teclasPresionadas["ArrowLeft"] || teclasPresionadas["ArrowRight"];
+
+  const juegoActivo = preguntaAnim.done && tiempoRestante > 0;
+
+  if ((moviendo || hayTecla) && juegoActivo) {
+    if (ahora - ultimoCambioSprite >= tiempoEntreSprites) {
+      const max = spritesPorDireccion[personajeSeleccionado];
+      frame = frame < max ? frame + 1 : 1;
+      ultimoCambioSprite = ahora;
+    }
+    img = imagenesCargadas[baseNombre]?.[direccion]?.[frame - 1];
+  } else {
+    frame = 1;
+    img = imagenesCargadas[baseNombre]?.["idle"];
+  }
+
+  if (img && img.complete) {
+    ctx.drawImage(img, posX - tileSize / 2, posY - tileSize / 2, tileSize, tileSize);
+  }
+
+  krisList.forEach(kris => {
+    if (kris.activo) {
+      let krisImg;
+      if (kris.moviendo) {
+        krisImg = krisSprites["kris"][kris.direccion][kris.frame - 1];
+      } else {
+        krisImg = krisSprites["kris"]["down"][0];
+      }
+      if (krisImg && krisImg.complete) {
+        ctx.drawImage(krisImg, kris.x - tileSize / 2, kris.y - tileSize / 2, tileSize, tileSize);
+      }
+    }
+  });
+}
+
+
+function iniciarContador() {
+  tiempoRestante = 50;
+  actualizarContador();
+
+  if (intervaloTiempo) clearInterval(intervaloTiempo);
+
+  intervaloTiempo = setInterval(() => {
+    tiempoRestante--;
+    actualizarContador();
+
+    if (tiempoRestante <= 0) {
+      clearInterval(intervaloTiempo);
+      terminarJuego("GAME OVER", "#ff4444"); 
+    }
+  }, 1000);
+}
+function actualizarContador() {
+  const valor = document.getElementById("contador-valor");
+  if (valor) {
+    valor.textContent = `${tiempoRestante}s`;
+  }
+}
+
+function mostrarGameOver() {
+  const valor = document.getElementById("contador-valor");
+  if (valor) {
+    valor.textContent = "GAME OVER 🕹️";
+    valor.classList.add("mensaje-final");
+    valor.style.color = "#ff4444";
+    valor.style.textShadow = "0 0 18px #ff4444, 0 0 32px #fff";
+    valor.style.fontSize = "3em";
+  }
+  mostrarBotonesFinJuego("perder");
+}
+
+function terminarJuego(mensaje, color) {
+  clearInterval(intervaloTiempo);
+  clearInterval(loopID);
+  const valor = document.getElementById("contador-valor");
+  if (valor) {
+    valor.textContent = mensaje;
+    valor.style.color = color;
+    if (mensaje.includes("Felicidades") || mensaje.includes("Has completado el nivel")) {
+      valor.style.fontSize = "1.5em"; 
+    } else {
+      valor.style.fontSize = "1.8em";
+    }
+  }
+  if (mensaje.includes("Felicidades") || mensaje.includes("Has completado el nivel")) {
+    mostrarBotonesFinJuego("ganar");
+  } else {
+    mostrarBotonesFinJuego("perder");
+  }
+}
+
+function inicializarBotonesNiveles() {
+  const botones = document.querySelectorAll('.nivel-btn');
+  botones.forEach(btn => {
+    const img = btn.getAttribute('data-img');
+    if (img) {
+      btn.style.backgroundImage = `url("Recursos/${img}")`;
+    }
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.getAttribute('data-nivel'), 10);
+      if (!isNaN(idx)) {
+        pausarMusicaFondo(); 
+        iniciarNivel(idx);
+      }
+    });
+  });
+}
+
+function moverKris() {
+  krisList.forEach(kris => {
+    if (!kris.activo || !preguntaAnim.done || tiempoRestante <= 0) return;
+
+    if (kris.moviendo) {
+      const dx = kris.destinoX - kris.x;
+      const dy = kris.destinoY - kris.y;
+      if (Math.abs(dx) > kris.velocidad) kris.x += kris.velocidad * Math.sign(dx);
+      else kris.x = kris.destinoX;
+      if (Math.abs(dy) > kris.velocidad) kris.y += kris.velocidad * Math.sign(dy);
+      else kris.y = kris.destinoY;
+      if (kris.x === kris.destinoX && kris.y === kris.destinoY) kris.moviendo = false;
+      return;
+    }
+
+    const col = Math.floor(kris.x / tileSize);
+    const fil = Math.floor(kris.y / tileSize);
+
+    let opciones = [];
+    if (puedeMoverKris(col, fil - 1)) opciones.push("up");
+    if (puedeMoverKris(col, fil + 1)) opciones.push("down");
+    if (puedeMoverKris(col - 1, fil)) opciones.push("left");
+    if (puedeMoverKris(col + 1, fil)) opciones.push("right");
+
+    if (opciones.length === 0) {
+      kris.moviendo = false;
+      return;
+    }
+
+    if (opciones.length === 1) {
+      kris.direccion = opciones[0];
+    } else {
+      let posibles = opciones.filter(dir => {
+        if (kris.direccion === "up" && dir === "down") return false;
+        if (kris.direccion === "down" && dir === "up") return false;
+        if (kris.direccion === "left" && dir === "right") return false;
+        if (kris.direccion === "right" && dir === "left") return false;
+        return true;
+      });
+      kris.direccion = posibles.length ? posibles[Math.floor(Math.random() * posibles.length)] : opciones[Math.floor(Math.random() * opciones.length)];
+    }
+
+    let dx = 0, dy = 0;
+    if (kris.direccion === "up") dy = -1;
+    if (kris.direccion === "down") dy = 1;
+    if (kris.direccion === "left") dx = -1;
+    if (kris.direccion === "right") dx = 1;
+    kris.destinoX = (col + dx) * tileSize + tileSize / 2;
+    kris.destinoY = (fil + dy) * tileSize + tileSize / 2;
+    kris.moviendo = true;
+    kris.frame = kris.frame < 4 ? kris.frame + 1 : 1;
+  });
+}
+
+function siguientePasoBFS(kris) {
+  const start = [Math.floor(kris.x / tileSize), Math.floor(kris.y / tileSize)];
+  const end = [Math.floor(posX / tileSize), Math.floor(posY / tileSize)];
+  const queue = [start];
+  const visited = {};
+  visited[start.join(",")] = null;
+
+  while (queue.length > 0) {
+    const [cx, cy] = queue.shift();
+    if (cx === end[0] && cy === end[1]) break;
+    [
+      [0, -1, "up"],
+      [0, 1, "down"],
+      [-1, 0, "left"],
+      [1, 0, "right"]
+    ].forEach(([dx, dy, dir]) => {
+      const nx = cx + dx, ny = cy + dy;
+      if (
+        nx >= 0 && ny >= 0 &&
+        ny < mapa.length && nx < mapa[0].length &&
+        puedeMoverKris(nx, ny) &&
+        !visited[`${nx},${ny}`]
+      ) {
+        visited[`${nx},${ny}`] = [cx, cy, dir];
+        queue.push([nx, ny]);
+      }
+    });
+  }
+
+  let path = [];
+  let cur = end;
+  while (visited[cur.join(",")]) {
+    path.unshift(cur);
+    cur = visited[cur.join(",")].slice(0, 2);
+  }
+  if (path.length > 1) {
+    const [nx, ny] = path[1];
+    const dir = visited[path[1].join(",")][2];
+    return { nx, ny, dir };
+  }
+  return null;
+}
+
+function verificarColisionKris() {
+  krisList.forEach(kris => {
+    if (kris.activo) {
+      const distKris = Math.abs(posX - kris.x) + Math.abs(posY - kris.y);
+      if (distKris < tileSize * 0.7) {
+        kris.activo = false;
+        terminarJuego("💀 Te atrapó Kris 💀", "#ff4444");
+      }
+    }
+  });
+}
+
+
+
 const mapasPorNivel = [
   // Dificultad facil
   [
