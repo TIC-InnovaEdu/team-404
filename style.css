@@ -77,7 +77,7 @@ body {
 #menu-principal .contenedor {
   max-width: 1500px;
   min-height: 675px; 
-  padding: 56px 56px 48px 56px; /* Más espacio interno */
+  padding: 56px 56px 48px 56px; 
 }
 
 #menu-principal .contenedor-flex {
@@ -133,7 +133,7 @@ body {
   margin-bottom: 32px;
   letter-spacing: 2px;
   font-weight: bold;
-  /* Neon border effect */
+  
   text-shadow:
     0 0 8px #00aaff,
     0 0 16px #00aaff,
@@ -141,7 +141,7 @@ body {
     0 0 32px #8f00ff,
     0 0 40px #fff,
     0 0 2px #fff;
-  /* Optional: glowing animation */
+  
   animation: neonGlow 1.5s infinite alternate;
 }
 
@@ -169,8 +169,8 @@ body {
 .menu-izquierda .titulo {
   align-self: center;
   width: 100%;
-  text-align: center; /* <-- Agrega esto */
-  margin-left: 0;     /* <-- Asegúrate que no tenga margen izquierdo */
+  text-align: center; 
+  margin-left: 0;     
 }
 
 .menu-izquierda {
@@ -178,7 +178,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: center; /* <-- Cambia de flex-end a center */
+  align-items: center; 
   gap: 24px;
 }
 
@@ -271,12 +271,12 @@ body {
 }
 
 .personaje-img {
-  width: 350px;      /* Antes 90px */
-  height: 350px;     /* Antes 180px */
+  width: 350px;      
+  height: 350px;     
   object-fit: contain;
   border-radius: 24px;
   background: transparent;
-  margin-bottom: 18px; /* Más espacio debajo */
+  margin-bottom: 18px; 
   display: block;
 }
 
@@ -300,4 +300,92 @@ body {
 .personaje-opcion:hover {
   border: 2px solid #00aaff;
   transform: scale(1.12);
+}
+
+.login-form,
+.registro-form {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 24px auto;
+  background: rgba(42, 0, 58, 0.8);
+  padding: 24px;
+  border-radius: 12px;
+}
+
+.niveles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 100px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.nivel-btn {
+  width: 90px;
+  height: 90px;
+  background-size: cover;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+  position: relative;     
+  overflow: hidden;        
+}
+.nivel-btn:hover {
+  transform: scale(1.08);
+}
+
+
+
+.nivel-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  transition: left 0.6s ease;
+  pointer-events: none;    
+  z-index: 2;              
+}
+
+.nivel-btn:hover::after {
+  left: 100%;
+}
+
+
+.titulo-dificultad {
+  font-family: 'Audiowide', 'Press Start 2P', 'Orbitron', Arial, sans-serif;
+  font-size: 3em;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 32px;
+  letter-spacing: 2px;
+  font-weight: bold;
+  text-shadow:
+    0 0 8px #00aaff,
+    0 0 16px #00aaff,
+    0 0 24px #8f00ff,
+    0 0 32px #8f00ff,
+    0 0 40px #fff,
+    0 0 2px #fff;
+  animation: neonGlow 1.5s infinite alternate;
+  width: 100%;
+  display: block;
+}
+
+.subtitulo-dificultad {
+  font-size: 1.6em;
+  margin: 18px 0 22px 0;
+  color: #fff;
+  text-shadow: 0 0 6px #00aaff;
+  text-align: center;           
+  font-family: 'Orbitron', 'Audiowide', Arial, sans-serif;
+  font-weight: bold;
+  letter-spacing: 1px;
+  width: 100%;                  
+  display: block;               
 }
