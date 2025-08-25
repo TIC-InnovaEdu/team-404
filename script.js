@@ -93,17 +93,16 @@ const preguntasPorNivel = [
   "¿Cuál de estas palabras es grave?",
 ];
 
-//palabras al azar para probar (no se identifica si es correcta o incorrecta)
 const palabrasPorNivel = [
-  ["Palabra", "Arena", "Mar", "Ola"],             
-  ["Perro", "Gato", "Pez", "Loro"],           
-  ["Rojo", "Verde", "Azul", "Amarillo"],       
-  ["Manzana", "Pera", "Uva", "Sandía"],        
-  ["Luna", "Sol", "Estrella", "Nube"],          
-  ["Uno", "Dos", "Tres", "Cuatro"],            
-  ["Fútbol", "Tenis", "Golf", "Natación"],      
-  ["Carro", "Bici", "Avión", "Tren"],           
-  ["Casa", "Escuela", "Parque", "Hospital"],    
+  ["perro", "café", "lunes", "pluma"],
+  ["azul", "ratón", "sofá", "lápiz"],
+  ["camión", "pájaro", "pared", "sol"], 
+  ["mamá", "jamás", "compás", "carro"],
+  ["hotel", "viernes", "gallo", "vaso"],
+  ["papá", "gato", "sofá", "sábado"],
+  ["alma", "papel", "martes", "mesa"],
+  ["silla", "pared", "brújula", "mueble"], 
+  ["luz", "maratón", "último", "gallina"],
 ];
 
 let ultimoCambioSprite = Date.now();
@@ -134,16 +133,15 @@ preCargarKrisSprites();
 
 const velocidadKrisPorNivel = [
   4,
-  4, 
+  4,
   5, 
+  5,
   5, 
-  5, 
-  6,
+  6, 
   6, 
   6, 
   7  
 ];
-
 
 document.addEventListener("keydown", (e) => {
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
@@ -159,7 +157,8 @@ document.addEventListener("keyup", (e) => {
   }
 });
 
-document.addEventListener("keydown", (e) => {  
+document.addEventListener("keydown", (e) => {
+  if (bloqueadoPorSonido) return;
   teclasPresionadas[e.key] = true;
   if (e.key === "Escape") {
     const juegoVisible = !document.getElementById("pantalla-juego").classList.contains("oculto");
@@ -169,16 +168,13 @@ document.addEventListener("keydown", (e) => {
       document.getElementById("menu-principal").classList.remove("oculto");
     }
     if (juegoVisible || nivelesVisible) {
+      detenerJuegoCompleto();
       volverAlMenu();
     }
   }
-
 });
 
-
-
 preCargarSprites(personajeSeleccionado);
-
 
 function preCargarSprites(nombreArchivo) {
   const baseNombre = nombreArchivo.split(".")[0].toLowerCase();
@@ -191,15 +187,16 @@ function preCargarSprites(nombreArchivo) {
     imagenesCargadas[baseNombre][dir] = [];
     for (let i = 1; i <= max; i++) {
       const img = new Image();
-      img.src = Recursos/${baseNombre}${i}${dir}.png;
+      img.src = `Recursos/${baseNombre}${i}${dir}.png`;
       imagenesCargadas[baseNombre][dir].push(img);
     }
   });
 
   const idle = new Image();
-  idle.src = Recursos/${baseNombre}Idle.png;
+  idle.src = `Recursos/${baseNombre}Idle.png`;
   imagenesCargadas[baseNombre]["idle"] = idle;
 }
+
 function mostrarJuego() {
   document.getElementById("menu-principal").classList.add("oculto");
   document.getElementById("pantalla-niveles").classList.add("oculto");
@@ -209,24 +206,29 @@ function mostrarJuego() {
 }
 
 function mostrarRegistro() {
+  detenerJuegoCompleto();
   document.getElementById("login-form").classList.add("oculto");
   document.getElementById("registro-form").classList.remove("oculto");
   pausarMusicaFondo();
 }
 
 function mostrarLogin() {
+  detenerJuegoCompleto();
   document.getElementById("registro-form").classList.add("oculto");
   document.getElementById("login-form").classList.remove("oculto");
   pausarMusicaFondo();
 }
 
 function volverAlMenu() {
+  detenerJuegoCompleto();
   document.getElementById("pantalla-juego").classList.add("oculto");
   document.getElementById("pantalla-niveles").classList.add("oculto");
   document.getElementById("menu-principal").classList.remove("oculto");
   reproducirMusicaFondo();
 }
+
 function salir() {
+  detenerJuegoCompleto();
   document.getElementById("menu-principal").classList.add("oculto");
   document.getElementById("pantalla-inicio").classList.remove("oculto");
   pausarMusicaFondo();
@@ -240,6 +242,7 @@ function irAlMenu() {
 }
 
 function mostrarNiveles() {
+  detenerJuegoCompleto();
   document.getElementById("pantalla-juego").classList.add("oculto");
   document.getElementById("menu-principal").classList.add("oculto");
   document.getElementById("pantalla-niveles").classList.remove("oculto");
@@ -247,6 +250,7 @@ function mostrarNiveles() {
 }
 
 function mostrarRecords() {
+  detenerJuegoCompleto();
   document.getElementById("menu-principal").classList.add("oculto");
   document.getElementById("pantalla-records").classList.remove("oculto");
   document.getElementById("records-subtitulo").textContent = "Selecciona un nivel para ver los records.";
@@ -367,6 +371,7 @@ function iniciarLoop() {
     moverKris();
     actualizarPosicion();
     verificarColisionKris(); 
+    dibujarMapa(ctx);
     dibujarPreguntaAnimada(ctx);
   }, 40);
 }
@@ -402,11 +407,10 @@ function dibujarPreguntaAnimada(ctx) {
       if (preguntaAnim.y > preguntaAnim.targetY) preguntaAnim.y = preguntaAnim.targetY;
     } else {
       preguntaAnim.fase = "fijo";
-      preguntaAnim.done = true;   
+      preguntaAnim.done = true;      
       iniciarContador();
     }
   }
-
   else if (preguntaAnim.fase === "fijo") {
     preguntaAnim.y = preguntaAnim.targetY;
   }
@@ -664,6 +668,8 @@ function iniciarContador() {
 
   if (intervaloTiempo) clearInterval(intervaloTiempo);
 
+  reproducirMusicaJuego();
+
   intervaloTiempo = setInterval(() => {
     tiempoRestante--;
     actualizarContador();
@@ -696,16 +702,28 @@ function mostrarGameOver() {
 function terminarJuego(mensaje, color) {
   clearInterval(intervaloTiempo);
   clearInterval(loopID);
+  pausarMusicaJuego();
   const valor = document.getElementById("contador-valor");
   if (valor) {
     valor.textContent = mensaje;
     valor.style.color = color;
     if (mensaje.includes("Felicidades") || mensaje.includes("Has completado el nivel")) {
-      valor.style.fontSize = "1.5em"; 
+      valor.style.fontSize = "1.5em";
     } else {
       valor.style.fontSize = "1.8em";
     }
   }
+
+  if (mensaje.includes("Has completado el nivel")) {
+    if (nivelActual === mapasPorNivel.length - 1) {
+      reproducirSonidoBloqueante(sonidoJuego);
+    } else {
+      reproducirSonidoBloqueante(sonidoNivel);
+    }
+  } else {
+    reproducirSonidoBloqueante(sonidoMuerte);
+  }
+
   if (mensaje.includes("Felicidades") || mensaje.includes("Has completado el nivel")) {
     mostrarBotonesFinJuego("ganar");
   } else {
@@ -865,7 +883,7 @@ function ocultarBotonesFinJuego() {
 
 document.getElementById("btn-niveles").onclick = function () {
   ocultarBotonesFinJuego();
-  mostrarNiveles();
+  pausarMusicaJuego(); 
 };
 document.getElementById("btn-menu").onclick = function () {
   ocultarBotonesFinJuego();
@@ -873,10 +891,12 @@ document.getElementById("btn-menu").onclick = function () {
 };
 document.getElementById("btn-reintentar").onclick = function () {
   ocultarBotonesFinJuego();
+  pausarMusicaJuego(); 
   iniciarNivel(nivelActual);
 };
 document.getElementById("btn-siguiente").onclick = function () {
   ocultarBotonesFinJuego();
+  pausarMusicaJuego(); 
   if (nivelActual < mapasPorNivel.length - 1) {
     iniciarNivel(nivelActual + 1);
   } else {
@@ -909,7 +929,7 @@ function pausarMusicaFondo() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
   musicaFondo = document.getElementById("musica-fondo");
 });
 
@@ -918,7 +938,108 @@ function entrarANivel(idx) {
   iniciarNivel(idx);
 }
 
+let musicaJuego;
+
+document.addEventListener("DOMContentLoaded", function() {
+  musicaJuego = document.getElementById("musica-juego");
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  sonidoMuerte = document.getElementById("sonido-muerte");
+  sonidoNivel = document.getElementById("sonido-nivel");
+  sonidoJuego = document.getElementById("sonido-juego");
+});
+
+function reproducirMusicaJuego() {
+  if (musicaJuego && musicaJuego.paused) {
+    musicaJuego.currentTime = 0;
+    musicaJuego.play();
+  }
+}
+
+function pausarMusicaJuego() {
+  if (musicaJuego && !musicaJuego.paused) {
+    musicaJuego.pause();
+    musicaJuego.currentTime = 0;
+  }
+}
+
+function reproducirSonidoBloqueante(audio, callback) {
+  bloqueadoPorSonido = true;
+  audio.currentTime = 0;
+  audio.play();
+  audio.onended = function() {
+    bloqueadoPorSonido = false;
+    if (callback) callback();
+  };
+}
+
+
+document.addEventListener("keydown", (e) => {
+  if (bloqueadoPorSonido) return;
+  teclasPresionadas[e.key] = true;
+  if (e.key === "Escape") {
+    const juegoVisible = !document.getElementById("pantalla-juego").classList.contains("oculto");
+    const nivelesVisible = !document.getElementById("pantalla-niveles").classList.contains("oculto");
+    if (!document.getElementById("pantalla-records").classList.contains("oculto")) {
+      document.getElementById("pantalla-records").classList.add("oculto");
+      document.getElementById("menu-principal").classList.remove("oculto");
+    }
+    if (juegoVisible || nivelesVisible) {
+      pausarMusicaJuego();
+      volverAlMenu();
+    }
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  if (bloqueadoPorSonido) return;
+  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+    e.preventDefault();
+    teclasPresionadas[e.key] = false;
+  }
+});
+
+document.getElementById("btn-niveles").onclick = function () {
+  if (bloqueadoPorSonido) return;
+  ocultarBotonesFinJuego();
+  pausarMusicaJuego();
+  mostrarNiveles();
+};
+document.getElementById("btn-menu").onclick = function () {
+  if (bloqueadoPorSonido) return;
+  ocultarBotonesFinJuego();
+  volverAlMenu();
+};
+document.getElementById("btn-reintentar").onclick = function () {
+  if (bloqueadoPorSonido) return;
+  ocultarBotonesFinJuego();
+  pausarMusicaJuego();
+  iniciarNivel(nivelActual);
+};
+document.getElementById("btn-siguiente").onclick = function () {
+  if (bloqueadoPorSonido) return;
+  ocultarBotonesFinJuego();
+  pausarMusicaJuego();
+  if (nivelActual < mapasPorNivel.length - 1) {
+    iniciarNivel(nivelActual + 1);
+  } else {
+    volverAlMenu();
+  }
+};
+
 inicializarBotonesNiveles();
+
+function detenerJuegoCompleto() {
+  if (intervaloTiempo) clearInterval(intervaloTiempo);
+  if (loopID) clearInterval(loopID);
+
+  pausarMusicaJuego();
+  if (sonidoMuerte) { sonidoMuerte.pause(); sonidoMuerte.currentTime = 0; }
+  if (sonidoNivel) { sonidoNivel.pause(); sonidoNivel.currentTime = 0; }
+  if (sonidoJuego) { sonidoJuego.pause(); sonidoJuego.currentTime = 0; }
+  bloqueadoPorSonido = false;
+}
 
 const mapasPorNivel = [
   // Dificultad facil
@@ -1123,3 +1244,8 @@ const mapasPorNivel = [
     [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
   ]
 ];
+
+
+
+
+
