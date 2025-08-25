@@ -20,47 +20,47 @@ let distanciaDesdeInicio = 0;
 const imagenesCargadas = {};
 
 const texturasPorNivel = [
-  { 
+  {
     bordes: "Recursos/bosque_arbol.png",
     camino: "Recursos/bosque_tierra.png",
     colision: "Recursos/bosque_arbusto.png"
   },
-  { 
+  {
     bordes: "Recursos/dulce_arbol.png",
     camino: "Recursos/dulce_tierra.png",
     colision: "Recursos/dulce_baston.png"
   },
-  { 
+  {
     bordes: "Recursos/playa_agua.png",
     camino: "Recursos/playa_arena.png",
     colision: "Recursos/playa_roca.png"
   },
-  { 
+  {
     bordes: "Recursos/bosque_arbol.png",
     camino: "Recursos/bosque_tierra.png",
     colision: "Recursos/bosque_arbusto.png"
   },
-  { 
+  {
     bordes: "Recursos/antartida_hielo.png",
     camino: "Recursos/antartida_nieve.png",
     colision: "Recursos/antartida_pico.png"
   },
-  { 
+  {
     bordes: "Recursos/cementerio_calavera.png",
     camino: "Recursos/cementerio_tierra.png",
     colision: "Recursos/cementerio_lapida.png"
   },
-  { 
+  {
     bordes: "Recursos/bosque_arbol.png",
     camino: "Recursos/bosque_tierra.png",
     colision: "Recursos/bosque_arbusto.png"
   },
-  { 
+  {
     bordes: "Recursos/dulce_arbol.png",
     camino: "Recursos/dulce_tierra.png",
     colision: "Recursos/dulce_baston.png"
   },
-  { 
+  {
     bordes: "Recursos/nether_lava.png",
     camino: "Recursos/nether_camino.png",
     colision: "Recursos/nether_roca.png"
@@ -74,7 +74,7 @@ let preguntaAnim = {
   maxSize: 40,
   y: null,
   targetY: null,
-  fase: "creciendo", 
+  fase: "creciendo",
   done: false
 };
 let mostrarPregunta = false;
@@ -96,12 +96,12 @@ const preguntasPorNivel = [
 const palabrasPorNivel = [
   ["perro", "café", "lunes", "pluma"],
   ["azul", "ratón", "sofá", "lápiz"],
-  ["camión", "pájaro", "pared", "sol"], 
+  ["camión", "pájaro", "pared", "sol"],
   ["mamá", "jamás", "compás", "carro"],
   ["hotel", "viernes", "gallo", "vaso"],
   ["papá", "gato", "sofá", "sábado"],
   ["alma", "papel", "martes", "mesa"],
-  ["silla", "pared", "brújula", "mueble"], 
+  ["silla", "pared", "brújula", "mueble"],
   ["luz", "maratón", "último", "gallina"],
 ];
 
@@ -134,18 +134,18 @@ preCargarKrisSprites();
 const velocidadKrisPorNivel = [
   4,
   4,
-  5, 
   5,
-  5, 
-  6, 
-  6, 
-  6, 
-  7  
+  5,
+  5,
+  6,
+  6,
+  6,
+  7
 ];
 
 document.addEventListener("keydown", (e) => {
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-    e.preventDefault(); 
+    e.preventDefault();
     teclasPresionadas[e.key] = true;
   }
 });
@@ -232,6 +232,8 @@ function salir() {
   document.getElementById("menu-principal").classList.add("oculto");
   document.getElementById("pantalla-inicio").classList.remove("oculto");
   pausarMusicaFondo();
+  limpiarLogin();
+  limpiarRegistro();
 }
 
 function irAlMenu() {
@@ -343,14 +345,16 @@ function cambiarPersonaje(nombre) {
   preCargarSprites(nombre);
 }
 
-function mostrarRegistro() {
-  document.getElementById("login-form").classList.add("oculto");
-  document.getElementById("registro-form").classList.remove("oculto");
-}
-
 function mostrarLogin() {
   document.getElementById("registro-form").classList.add("oculto");
   document.getElementById("login-form").classList.remove("oculto");
+  limpiarLogin();
+}
+
+function mostrarRegistro() {
+  document.getElementById("login-form").classList.add("oculto");
+  document.getElementById("registro-form").classList.remove("oculto");
+  limpiarRegistro();
 }
 
 function iniciarLoop() {
@@ -370,7 +374,7 @@ function iniciarLoop() {
     moverPersonaje();
     moverKris();
     actualizarPosicion();
-    verificarColisionKris(); 
+    verificarColisionKris();
     dibujarMapa(ctx);
     dibujarPreguntaAnimada(ctx);
   }, 40);
@@ -407,7 +411,7 @@ function dibujarPreguntaAnimada(ctx) {
       if (preguntaAnim.y > preguntaAnim.targetY) preguntaAnim.y = preguntaAnim.targetY;
     } else {
       preguntaAnim.fase = "fijo";
-      preguntaAnim.done = true;      
+      preguntaAnim.done = true;
       iniciarContador();
     }
   }
@@ -453,7 +457,7 @@ function dibujarPreguntaAnimada(ctx) {
 
 function moverPersonaje() {
   if (!preguntaAnim.done) return;
-  if (tiempoRestante <= 0) return; 
+  if (tiempoRestante <= 0) return;
   if (moviendo) return;
 
   const col = Math.floor(posX / tileSize);
@@ -676,7 +680,7 @@ function iniciarContador() {
 
     if (tiempoRestante <= 0) {
       clearInterval(intervaloTiempo);
-      terminarJuego("GAME OVER", "#ff4444"); 
+      terminarJuego("GAME OVER", "#ff4444");
     }
   }, 1000);
 }
@@ -714,6 +718,19 @@ function terminarJuego(mensaje, color) {
     }
   }
 
+  if (window.usuarioActual && mensaje.includes("Has completado el nivel")) {
+    fetch('http://localhost:3000/guardar_record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        usuario_id: window.usuarioActual._id,
+        nombre: window.usuarioActual.nombre,
+        nivel: nivelActual,
+        tiempo_segundos: tiempoRestante // <-- Guarda el tiempo que queda
+      })
+    });
+  }
+
   if (mensaje.includes("Has completado el nivel")) {
     if (nivelActual === mapasPorNivel.length - 1) {
       reproducirSonidoBloqueante(sonidoJuego);
@@ -741,7 +758,7 @@ function inicializarBotonesNiveles() {
     btn.addEventListener('click', () => {
       const idx = parseInt(btn.getAttribute('data-nivel'), 10);
       if (!isNaN(idx)) {
-        pausarMusicaFondo(); 
+        pausarMusicaFondo();
         iniciarNivel(idx);
       }
     });
@@ -883,7 +900,7 @@ function ocultarBotonesFinJuego() {
 
 document.getElementById("btn-niveles").onclick = function () {
   ocultarBotonesFinJuego();
-  pausarMusicaJuego(); 
+  pausarMusicaJuego();
 };
 document.getElementById("btn-menu").onclick = function () {
   ocultarBotonesFinJuego();
@@ -891,12 +908,12 @@ document.getElementById("btn-menu").onclick = function () {
 };
 document.getElementById("btn-reintentar").onclick = function () {
   ocultarBotonesFinJuego();
-  pausarMusicaJuego(); 
+  pausarMusicaJuego();
   iniciarNivel(nivelActual);
 };
 document.getElementById("btn-siguiente").onclick = function () {
   ocultarBotonesFinJuego();
-  pausarMusicaJuego(); 
+  pausarMusicaJuego();
   if (nivelActual < mapasPorNivel.length - 1) {
     iniciarNivel(nivelActual + 1);
   } else {
@@ -909,10 +926,50 @@ function volverAlMenuDesdeRecords() {
   document.getElementById("menu-principal").classList.remove("oculto");
 }
 
-function verRecordsNivel(nivel) {
-  document.getElementById("tabla-records").innerHTML =
-    `<p class="subtitulo-dificultad">Records del nivel ${nivel + 1}:</p>
-     <p>(Aquí se mostrarán los 5 mejores tiempos)</p>`;
+function terminarJuego(mensaje, color) {
+  clearInterval(intervaloTiempo);
+  clearInterval(loopID);
+  pausarMusicaJuego();
+  const valor = document.getElementById("contador-valor");
+  if (valor) {
+    valor.textContent = mensaje;
+    valor.style.color = color;
+    if (mensaje.includes("Felicidades") || mensaje.includes("Has completado el nivel")) {
+      valor.style.fontSize = "1.5em";
+    } else {
+      valor.style.fontSize = "1.8em";
+    }
+  }
+
+  // ...dentro de terminarJuego...
+  if (window.usuarioActual && mensaje.includes("Has completado el nivel")) {
+    fetch('http://localhost:3000/guardar_record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        usuario_id: window.usuarioActual._id,
+        nombre: window.usuarioActual.nombre, // <-- GUARDA EL NOMBRE AQUÍ
+        nivel: nivelActual,
+        tiempo_segundos: tiempoRestante
+      })
+    });
+  }
+
+  if (mensaje.includes("Has completado el nivel")) {
+    if (nivelActual === mapasPorNivel.length - 1) {
+      reproducirSonidoBloqueante(sonidoJuego);
+    } else {
+      reproducirSonidoBloqueante(sonidoNivel);
+    }
+  } else {
+    reproducirSonidoBloqueante(sonidoMuerte);
+  }
+
+  if (mensaje.includes("Felicidades") || mensaje.includes("Has completado el nivel")) {
+    mostrarBotonesFinJuego("ganar");
+  } else {
+    mostrarBotonesFinJuego("perder");
+  }
 }
 
 function reproducirMusicaFondo() {
@@ -929,7 +986,7 @@ function pausarMusicaFondo() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   musicaFondo = document.getElementById("musica-fondo");
 });
 
@@ -940,11 +997,11 @@ function entrarANivel(idx) {
 
 let musicaJuego;
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   musicaJuego = document.getElementById("musica-juego");
 });
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   sonidoMuerte = document.getElementById("sonido-muerte");
   sonidoNivel = document.getElementById("sonido-nivel");
   sonidoJuego = document.getElementById("sonido-juego");
@@ -968,7 +1025,7 @@ function reproducirSonidoBloqueante(audio, callback) {
   bloqueadoPorSonido = true;
   audio.currentTime = 0;
   audio.play();
-  audio.onended = function() {
+  audio.onended = function () {
     bloqueadoPorSonido = false;
     if (callback) callback();
   };
@@ -1039,6 +1096,117 @@ function detenerJuegoCompleto() {
   if (sonidoNivel) { sonidoNivel.pause(); sonidoNivel.currentTime = 0; }
   if (sonidoJuego) { sonidoJuego.pause(); sonidoJuego.currentTime = 0; }
   bloqueadoPorSonido = false;
+}
+
+function iniciarSesion() {
+  const usuario = document.querySelector('#login-form input[type="text"]').value;
+  const clave = document.querySelector('#login-form input[type="password"]').value;
+
+  fetch('http://localhost:3000/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre: usuario, clave: clave })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.ok) {
+        window.usuarioActual = data.usuario;
+        irAlMenu();
+      } else {
+        alert(data.error || "Usuario o clave incorrectos");
+      }
+    })
+    .catch(() => alert("Error de conexión con el servidor"));
+}
+
+function registrarUsuario() {
+  const nombre = document.querySelector('#registro-form input[placeholder="Nombre"]').value;
+  const clave = document.querySelector('#registro-form input[placeholder="Clave"]').value;
+  const edad = document.querySelector('#registro-form input[placeholder="Edad"]').value;
+  const correo = document.querySelector('#registro-form input[placeholder="Correo"]').value;
+  const curso = document.querySelector('#registro-form input[placeholder="Curso"]').value;
+  const genero = document.querySelector('#registro-form select').value;
+
+  fetch('http://localhost:3000/registro', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre, clave, edad, correo, curso, genero })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.ok) {
+        alert("¡Registro exitoso! Ahora inicia sesión.");
+        mostrarLogin();
+      } else {
+        alert(data.error || "Error al registrar usuario");
+      }
+    })
+    .catch(() => alert("Error de conexión con el servidor"));
+}
+
+function limpiarLogin() {
+  const loginForm = document.getElementById("login-form");
+  if (!loginForm) return;
+  const inputs = loginForm.querySelectorAll("input");
+  inputs.forEach(input => input.value = "");
+}
+
+function limpiarRegistro() {
+  const registroForm = document.getElementById("registro-form");
+  if (!registroForm) return;
+  const inputs = registroForm.querySelectorAll("input");
+  inputs.forEach(input => input.value = "");
+  const select = registroForm.querySelector("select");
+  if (select) select.selectedIndex = 0;
+}
+
+function verRecordsNivel(nivel) {
+  document.getElementById("modal-records").classList.remove("oculto");
+  document.getElementById("modal-records-titulo").textContent = `Records del nivel ${nivel + 1}`;
+
+  fetch(`http://localhost:3000/leer_records?nivel=${nivel}`)
+    .then(res => res.json())
+    .then(records => {
+      // Solo el mejor tiempo por usuario
+      const mejoresPorUsuario = {};
+      records.forEach(rec => {
+        if (!mejoresPorUsuario[rec.usuario_id] || rec.tiempo_segundos > mejoresPorUsuario[rec.usuario_id].tiempo_segundos) {
+          mejoresPorUsuario[rec.usuario_id] = rec;
+        }
+      });
+      const mejores = Object.values(mejoresPorUsuario)
+        .sort((a, b) => b.tiempo_segundos - a.tiempo_segundos) // Ordena de mayor a menor
+        .slice(0, 5);
+
+      if (mejores.length === 0) {
+        document.getElementById("modal-records-tabla").innerHTML = "<p style='text-align:center;'>No hay records para este nivel.</p>";
+        return;
+      }
+
+      let html = `<table style="width:100%;text-align:center;border-collapse:collapse;font-size:1.1em;">
+        <tr style="background:#222;color:#00aaff;">
+          <th>Puesto</th>
+          <th>Usuario</th>
+          <th>Tiempo restante (s)</th>
+        </tr>`;
+      mejores.forEach((rec, i) => {
+        html += `<tr style="background:${i % 2 == 0 ? '#333' : '#444'};">
+          <td>${i + 1}</td>
+          <td>${rec.nombre || ''}</td>
+          <td>${rec.tiempo_segundos !== undefined ? rec.tiempo_segundos : ''}</td>
+        </tr>`;
+      });
+      html += "</table>";
+      document.getElementById("modal-records-tabla").innerHTML = html;
+    })
+    .catch(() => {
+      document.getElementById("modal-records-tabla").innerHTML = "<p style='text-align:center;'>Error al cargar records.</p>";
+    });
+    
+}
+function cerrarModalRecords() {
+  document.getElementById("modal-records").classList.add("oculto");
+  document.getElementById("modal-records-tabla").innerHTML = "";
 }
 
 const mapasPorNivel = [
@@ -1244,8 +1412,4 @@ const mapasPorNivel = [
     [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
   ]
 ];
-
-
-
-
 

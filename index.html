@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 
 <head>
@@ -21,7 +20,7 @@
         <h2>Iniciar Sesión</h2>
         <input type="text" placeholder="Usuario" />
         <input type="password" placeholder="Clave" />
-        <button class="btn-grande" onclick="irAlMenu()">Entrar</button>
+        <button class="btn-grande" onclick="iniciarSesion()">Entrar</button>
         <div class="alternar-form">
           ¿No tienes cuenta? <span onclick="mostrarRegistro()" class="alternar-link">Regístrate</span>
         </div>
@@ -39,7 +38,7 @@
           <option value="F">Femenino</option>
           <option value="Otro">Otro</option>
         </select>
-        <button class="btn-grande" onclick="irAlMenu()">Registrarse</button>
+        <button class="btn-grande" onclick="registrarUsuario()">Registrarse</button>
         <div class="alternar-form">
           ¿Ya tienes cuenta? <span onclick="mostrarLogin()" class="alternar-link">Inicia sesión</span>
         </div>
@@ -190,8 +189,25 @@
     </div>
   </section>
 
+  <!-- Modal de records -->
+  <div id="modal-records" class="oculto" style="
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(42,0,58,0.85); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+    <div id="modal-records-content" style="
+    background: #2a003a; border-radius: 18px; padding: 32px 40px; min-width: 340px; max-width: 500px;
+    box-shadow: 0 8px 32px #000a; color: #fff; position: relative;">
+      <button onclick="cerrarModalRecords()" style="
+      position: absolute; top: 18px; right: 18px; background: #00aaff; color: #fff; border: none;
+      border-radius: 8px; font-size: 1.1em; padding: 6px 16px; cursor: pointer;">Cerrar</button>
+      <div id="modal-records-titulo"
+        style="font-size: 1.5em; margin-bottom: 18px; text-align: center; font-weight: bold; text-shadow: 0 0 8px #00aaff;">
+        Records</div>
+      <div id="modal-records-tabla"></div>
+    </div>
+  </div>
+
   <audio id="musica-fondo" src="Recursos/FondoMenu.wav" loop></audio>
-  <audio id="musica-juego" src="Recursos/FondoJuego.wav" loop></audio>
+  <audio id="musica-juego" src="Recursos/Fondojuego.wav" loop></audio>
   <audio id="sonido-muerte" src="Recursos/Muerte.wav"></audio>
   <audio id="sonido-nivel" src="Recursos/NivelCompletado.wav"></audio>
   <audio id="sonido-juego" src="Recursos/JuegoCompletado.wav"></audio>
